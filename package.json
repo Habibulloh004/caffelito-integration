@@ -1,0 +1,20 @@
+{
+     "name": "express-poster-storage",
+     "version": "1.0.0",
+     "description": "Poster Storage Data Export with Express.js",
+     "main": "server.js",
+     "scripts": {
+          "start": "node server.js",
+          "dev": "nodemon server.js"
+     },
+     "dependencies": {
+          "axios": "^1.7.2",
+          "content-disposition": "^0.5.4",
+          "cookie-parser": "^1.4.7",
+          "express": "^4.19.2",
+          "xlsx": "^0.18.5"
+     },
+     "devDependencies": {
+          "nodemon": "^3.1.4"
+     }
+}

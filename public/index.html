@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poster Storage</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.min.js"></script>
+  </head>
+  <body>
+    <section class="container">
+      <div class="export-row">
+        <div id="error-message" class="error-message"></div>
+        <div class="flex-container">
+          <div class="relative">
+            <button id="calendar-toggle" class="calendar-button">
+              📅 Выберите дату
+            </button>
+            <input type="text" id="date-range" style="display: none" />
+          </div>
+          <button id="export-button" class="export-button">Экспорт XLSX</button>
+        </div>
+        <div id="loading" class="loading" style="display: none">
+          <div class="spinner"></div>
+          <h1>Пожалуйста, подождите, идет загрузка данных...</h1>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/l10n/ru.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
