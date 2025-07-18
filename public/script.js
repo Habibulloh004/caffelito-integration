@@ -1,21 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Fix: Create separate date objects for each range
   const today = new Date();
   const quickRanges = {
-    today: { label: "Сегодня", from: today, to: today },
+    today: {
+      label: "Сегодня",
+      from: new Date(today),
+      to: new Date(today),
+    },
     yesterday: {
       label: "Вчера",
-      from: new Date(today.setDate(today.getDate() - 1)),
-      to: new Date(today.setDate(today.getDate() - 1)),
+      from: new Date(today.getTime() - 24 * 60 * 60 * 1000),
+      to: new Date(today.getTime() - 24 * 60 * 60 * 1000),
     },
     last7Days: {
       label: "Последняя неделя",
-      from: new Date(today.setDate(today.getDate() - 6)),
-      to: today,
+      from: new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000),
+      to: new Date(today),
     },
     last30Days: {
       label: "Последний месяц",
-      from: new Date(today.setDate(today.getDate() - 29)),
-      to: today,
+      from: new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000),
+      to: new Date(today),
     },
   };
 
@@ -78,31 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${day}.${month}.${year},${hours}:${minutes}`;
   }
 
-  // Yordamchi funksiyalar (utils/functions.js dan ko'chirildi)
-  // function formatCustomDate(dateString) {
-  //   const monthsRu = [
-  //     "январь",
-  //     "февраль",
-  //     "март",
-  //     "апрель",
-  //     "май",
-  //     "июнь",
-  //     "июль",
-  //     "август",
-  //     "сентябрь",
-  //     "октябрь",
-  //     "ноябрь",
-  //     "декабрь",
-  //   ];
-  //   const date = new Date(dateString);
-  //   const year = date.getFullYear();
-  //   const day = String(date.getDate()).padStart(2, "0");
-  //   const month = monthsRu[date.getMonth()];
-  //   const hours = String(date.getHours()).padStart(2, "0");
-  //   const minutes = String(date.getMinutes()).padStart(2, "0");
-  //   return `${day} ${month} ${hours}:${minutes}`;
-  // }
-
   function formatSupplySum(sum, div = true) {
     if (typeof sum !== "number") return 0;
     const divided = div ? sum / 100 : sum;
@@ -122,8 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
     button.textContent = label;
     button.className = "quick-range-button";
     button.addEventListener("click", () => {
-      fp.setDate([from, to]);
-      calendarToggle.textContent = `📅 ${formatDate(from)} - ${formatDate(to)}`;
+      // Create fresh date objects when setting
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+      fp.setDate([fromDate, toDate]);
+      calendarToggle.textContent = `📅 ${formatDate(fromDate)} - ${formatDate(
+        toDate
+      )}`;
     });
     quickRangesContainer.appendChild(button);
   });
@@ -186,8 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const fromDate = dates[0].toISOString().split("T")[0];
-    const toDate = dates[1].toISOString().split("T")[0];
+    const fromDate = dates[0].toLocaleDateString("en-CA");
+    const toDate = dates[1].toLocaleDateString("en-CA");
     const dayDiff = (dates[1] - dates[0]) / (1000 * 60 * 60 * 24);
 
     if (dayDiff > 31) {
@@ -427,7 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       ? "шт"
                       : "л",
                   storage_name: findStore.storage_name || "Unknown",
-                  worker_name: findWorker.name || "Unknown"
+                  worker_name: findWorker.name || "Unknown",
                 };
               }
               // else {
