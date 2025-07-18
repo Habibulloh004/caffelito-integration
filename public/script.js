@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let productsData = [];
   let ingredientsData = [];
   let storesData = [];
+  let workersData = [];
 
   // Flatpickr sozlash
   const fp = flatpickr(dateRangeInput, {
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${day}.${month}.${year},${hours}:${minutes}`;
   }
-  
+
   // Yordamchi funksiyalar (utils/functions.js dan ko'chirildi)
   // function formatCustomDate(dateString) {
   //   const monthsRu = [
@@ -106,12 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof sum !== "number") return 0;
     const divided = div ? sum / 100 : sum;
     return Number(divided.toFixed(2)); // return as number
-  }
-
-  function formatWeight(sum) {
-    if (typeof sum != "number") return "Noto‘g‘ri qiymat";
-    const divided = sum / 100;
-    return divided.toFixed().toLocaleString("ru-RU", {});
   }
 
   // Kalendar ochish/yopish
@@ -159,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Boshlang'ich ma'lumotlarni olish
   async function fetchInitialData() {
     try {
-      const [products, ingredients, stores] = await Promise.all([
+      const [products, ingredients, stores, workers] = await Promise.all([
         axios.get("/api/poster/fetch-poster-api", {
           params: { token, endpoint: "menu.getProducts" },
         }),
@@ -169,10 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
         axios.get("/api/poster/fetch-poster-api", {
           params: { token, endpoint: "storage.getStorages" },
         }),
+        axios.get("/api/poster/fetch-poster-api", {
+          params: { token, endpoint: "access.getEmployees" },
+        }),
       ]);
       productsData = products.data.response || [];
       ingredientsData = ingredients.data.response || [];
       storesData = stores.data.response || [];
+      workersData = workers.data.response || [];
     } catch (err) {
       errorMessage.textContent = `Ошибка при получении данных: ${err.message}`;
       console.error("Initial data fetch error:", err);
@@ -406,6 +405,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 storesData.find(
                   (store) => store.storage_id == fullWastes.storage_id
                 ) || {};
+              const findWorker =
+                workersData.find(
+                  (worker) => worker.user_id == fullWastes.user_id
+                ) || {};
+
               if (element?.type == "10") {
                 findRest =
                   ingredientsData.find(
@@ -423,8 +427,9 @@ document.addEventListener("DOMContentLoaded", () => {
                       ? "шт"
                       : "л",
                   storage_name: findStore.storage_name || "Unknown",
+                  worker_name: findWorker.name || "Unknown"
                 };
-              } 
+              }
               // else {
               //   findRest =
               //     productsData.find(
@@ -475,8 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "Ед. изм.",
             "Сумма без НДС",
             "Склад",
-            "Сотрудник",
-            "Комментарий"
+            "Комментарий",
           ],
           data: suppliesData.map((item) => [
             item.supply_id || "",
@@ -485,10 +489,12 @@ document.addEventListener("DOMContentLoaded", () => {
             item?.ingredient_name || "Unknown",
             Number(item?.supply_ingredient_num) || 0,
             item?.ingredient_unit || "Unknown",
-            formatSupplySum(Number(item?.supply_ingredient_sum_netto || 0), false),
+            formatSupplySum(
+              Number(item?.supply_ingredient_sum_netto || 0),
+              false
+            ),
             item.storage_name || "Unknown",
-            item.account_id || "",
-            "",
+            item.supply_comment || "",
           ]),
         },
         {
@@ -499,7 +505,6 @@ document.addEventListener("DOMContentLoaded", () => {
             "Кол-во",
             "Ед. изм.",
             "Сумма без НДС",
-            "Комментарий",
             "Склад отгрузки",
             "Склад приемки",
             "Сотрудник",
@@ -512,7 +517,6 @@ document.addEventListener("DOMContentLoaded", () => {
             Number(item?.ingredient_num) || 0,
             item?.ingredient_unit || "Unknown",
             formatSupplySum(Number(item?.ingredient_sum_netto || 0), false),
-            "",
             item.to_storage_name || "Unknown",
             item.from_storage_name || "Unknown",
             item.user_name || "Unknown",
@@ -529,7 +533,6 @@ document.addEventListener("DOMContentLoaded", () => {
             "Сумма без НДС",
             "Причина",
             "Сотрудник",
-            "Комментарий"
           ],
           data: wastesData.map((item) => [
             formatCustomDate(String(item.date || new Date())),
@@ -539,6 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item?.ingredient_unit || "Unknown",
             formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)),
             item.reason_name || "Unknown",
+            item.worker_name || "Unknown",
           ]),
         },
       ];
