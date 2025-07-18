@@ -67,35 +67,45 @@ document.addEventListener("DOMContentLoaded", () => {
       .padStart(2, "0")}.${date.getFullYear()}`;
   }
 
-  // Yordamchi funksiyalar (utils/functions.js dan ko'chirildi)
   function formatCustomDate(dateString) {
-    const monthsRu = [
-      "январь",
-      "февраль",
-      "март",
-      "апрель",
-      "май",
-      "июнь",
-      "июль",
-      "август",
-      "сентябрь",
-      "октябрь",
-      "ноябрь",
-      "декабрь",
-    ];
-    const date = new Date(dateString);
-    const year = date.getFullYear();
+    const date = new Date(dateString.replace(" ", "T"));
     const day = String(date.getDate()).padStart(2, "0");
-    const month = monthsRu[date.getMonth()];
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${day} ${month} ${hours}:${minutes}`;
+    return `${day}.${month}.${year},${hours}:${minutes}`;
   }
+  
+  // Yordamchi funksiyalar (utils/functions.js dan ko'chirildi)
+  // function formatCustomDate(dateString) {
+  //   const monthsRu = [
+  //     "январь",
+  //     "февраль",
+  //     "март",
+  //     "апрель",
+  //     "май",
+  //     "июнь",
+  //     "июль",
+  //     "август",
+  //     "сентябрь",
+  //     "октябрь",
+  //     "ноябрь",
+  //     "декабрь",
+  //   ];
+  //   const date = new Date(dateString);
+  //   const year = date.getFullYear();
+  //   const day = String(date.getDate()).padStart(2, "0");
+  //   const month = monthsRu[date.getMonth()];
+  //   const hours = String(date.getHours()).padStart(2, "0");
+  //   const minutes = String(date.getMinutes()).padStart(2, "0");
+  //   return `${day} ${month} ${hours}:${minutes}`;
+  // }
 
   function formatSupplySum(sum, div = true) {
-    if (typeof sum !== "number") return "Noto‘g‘ri qiymat";
+    if (typeof sum !== "number") return 0;
     const divided = div ? sum / 100 : sum;
-    return divided.toFixed(2).toLocaleString("ru-RU", {});
+    return Number(divided.toFixed(2)); // return as number
   }
 
   function formatWeight(sum) {
@@ -465,8 +475,8 @@ document.addEventListener("DOMContentLoaded", () => {
             "Ед. изм.",
             "Сумма без НДС",
             "Склад",
-            "Счёт",
             "Сотрудник",
+            "Комментарий"
           ],
           data: suppliesData.map((item) => [
             item.supply_id || "",
@@ -475,8 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item?.ingredient_name || "Unknown",
             Number(item?.supply_ingredient_num) || 0,
             item?.ingredient_unit || "Unknown",
-            formatSupplySum(Number(item?.supply_ingredient_sum_netto || 0), false).replace(".", ",") +
-              "",
+            formatSupplySum(Number(item?.supply_ingredient_sum_netto || 0), false),
             item.storage_name || "Unknown",
             item.account_id || "",
             "",
@@ -502,7 +511,7 @@ document.addEventListener("DOMContentLoaded", () => {
               : item?.product_name || "Unknown",
             Number(item?.ingredient_num) || 0,
             item?.ingredient_unit || "Unknown",
-            formatSupplySum(Number(item?.ingredient_sum_netto || 0), false).replace(".", ",") + "",
+            formatSupplySum(Number(item?.ingredient_sum_netto || 0), false),
             "",
             item.to_storage_name || "Unknown",
             item.from_storage_name || "Unknown",
@@ -519,6 +528,8 @@ document.addEventListener("DOMContentLoaded", () => {
             "Ед-ца измерения",
             "Сумма без НДС",
             "Причина",
+            "Сотрудник",
+            "Комментарий"
           ],
           data: wastesData.map((item) => [
             formatCustomDate(String(item.date || new Date())),
@@ -526,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item?.ingredient_name || "Unknown",
             item?.ingredients[0].weight || 0,
             item?.ingredient_unit || "Unknown",
-            formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)).replace(".", ",") + "",
+            formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)),
             item.reason_name || "Unknown",
           ]),
         },
