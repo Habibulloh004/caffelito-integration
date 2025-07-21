@@ -74,12 +74,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function formatCustomDate(dateString) {
+    // Replace space with 'T' to make it ISO compatible
     const date = new Date(dateString.replace(" ", "T"));
+
+    // Add 2 hours
+    date.setHours(date.getHours() + 2);
+
+    // Format components with leading zeros
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
+
     return `${day}.${month}.${year},${hours}:${minutes}`;
   }
 
@@ -453,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ).then((results) => results.flat().filter(Boolean));
 
       // Excel faylini yaratish
+      console.log(wastesData);
       const exportChunks = [
         {
           name: "Поставки",
