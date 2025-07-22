@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       ? "кг"
                       : findRest?.ingredient_unit == "p"
                       ? "шт"
-                      : "шт",
+                      : "л",
                   storage_name: findStore.storage_name || "Unknown",
                 };
               } else {
@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       ? "кг"
                       : findIngredient?.unit == "p"
                       ? "шт"
-                      : "шт",
+                      : "л",
                   storage_name: findStore.storage_name || "Unknown",
                 };
               }
@@ -473,7 +473,6 @@ document.addEventListener("DOMContentLoaded", () => {
         )
       ).flat(); // barcha waste larni tekis arrayga aylantiradi
 
-      console.log(wastesData);
       // Excel faylini yaratish
       const exportChunks = [
         {
@@ -548,7 +547,11 @@ document.addEventListener("DOMContentLoaded", () => {
               ? item?.ingredient_name || "Unknown"
               : item?.product_name || "Unknown",
             item?.ingredients[0].weight || 0,
-            item?.ingredient_unit || "Unknown",
+            item?.ingredients[0].unit == "kg"
+              ? "кг"
+              : item?.ingredients[0].unit == "p"
+              ? "шт"
+              : "л",
             formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)),
             item.reason_name || "Unknown",
             item.worker_name || "Unknown",
