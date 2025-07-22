@@ -369,112 +369,99 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         })
       ).then((results) => results.flat());
-      const off = [];
-      const write = [];
-      const wast = [];
+
       // Wastes ma'lumotlarini qayta ishlash
-      wastesData = (
-        await Promise.all(
-          wastesData.map(async (item, idx) => {
-            try {
-              const dataFetch = await axios
-                .get("/api/poster/fetch-poster-api", {
-                  params: {
-                    token,
-                    endpoint: "storage.getWaste",
-                    waste_id: item.waste_id,
-                  },
-                })
-                .catch((err) => {
-                  throw new Error(
-                    `Failed to fetch waste data for waste_id ${item.waste_id}: ${err.message}`
-                  );
-                });
+      wastesData = await Promise.all(
+        wastesData.map(async (item) => {
+          try {
+            const dataFetch = await axios
+              .get("/api/poster/fetch-poster-api", {
+                params: {
+                  token,
+                  endpoint: "storage.getWaste",
+                  waste_id: item.waste_id,
+                },
+              })
+              .catch((err) => {
+                throw new Error(
+                  `Failed to fetch waste data for waste_id ${item.waste_id}: ${err.message}`
+                );
+              });
 
-              const fullWastes = dataFetch.data.response || {};
-              const elements = fullWastes.elements || [];
+            const fullWastes = dataFetch.data.response || {};
+            const elements = fullWastes.elements || [];
 
-              const resultList = [];
+            return elements.map((element) => {
+              let findRest;
+              const findStore =
+                storesData.find(
+                  (store) => store.storage_id == fullWastes.storage_id
+                ) || {};
+              const findWorker =
+                workersData.find(
+                  (worker) => worker.user_id == fullWastes.user_id
+                ) || {};
 
-              for (const element of elements) {
-                console.log(element);
-                const findStore =
-                  storesData.find(
-                    (store) => store.storage_id == fullWastes.storage_id
+              if (element?.type == "10") {
+                findRest =
+                  ingredientsData.find(
+                    (ingredient) =>
+                      ingredient.ingredient_id == element.ingredient_id
                   ) || {};
-                const findWorker =
-                  workersData.find(
-                    (worker) => worker.user_id == fullWastes.user_id
-                  ) || {};
-
-                if (element?.type == "10") {
-                  const findRest =
-                    ingredientsData.find(
-                      (ingredient) =>
-                        ingredient.ingredient_id == element.ingredient_id
-                    ) || {};
-
-                  resultList.push({
-                    ...fullWastes,
-                    ...element,
-                    ...findRest,
-                    ingredient_unit:
-                      findRest?.ingredient_unit == "kg"
-                        ? "кг"
-                        : findRest?.ingredient_unit == "p"
-                        ? "шт"
-                        : "л",
-                    storage_name: findStore.storage_name || "Unknown",
-                    worker_name: findWorker.name || "Unknown",
-                  });
-                } else {
-                  const findRest =
-                    productsData.find(
-                      (product) => product.product_id == element.product_id
-                    ) || {};
-
-                  const ingredients = element.ingredients || [];
-
-                  for (const ing of ingredients) {
-                    const ingredientMeta =
-                      ingredientsData.find(
-                        (i) => i.ingredient_id == ing.ingredient_id
-                      ) || {};
-
-                    const itemToPush = {
-                      ...element,
-                      ...findRest,
-                      ...fullWastes,
-                      ingredients: [ing], // har bir product uchun faqat 1 ta ingredient
-                      ingredient_unit:
-                        ingredientMeta?.unit == "kg"
-                          ? "кг"
-                          : ingredientMeta?.unit == "p"
-                          ? "шт"
-                          : "л",
-                      storage_name: findStore.storage_name || "Unknown",
-                      worker_name: findWorker.name || "Unknown",
-                    };
-
-                    resultList.push(itemToPush);
-                  }
-                }
+                return {
+                  ...fullWastes,
+                  ...element,
+                  ...findRest,
+                  ingredient_unit:
+                    findRest?.ingredient_unit == "kg"
+                      ? "кг"
+                      : findRest?.ingredient_unit == "p"
+                      ? "шт"
+                      : "л",
+                  storage_name: findStore.storage_name || "Unknown",
+                  worker_name: findWorker.name || "Unknown",
+                };
               }
+              // else {
+              //   findRest =
+              //     productsData.find(
+              //       (product) => product.product_id == element.product_id
+              //     ) || {};
+              //   const findIngredient =
+              //     ingredientsData.find(
+              //       (ing) =>
+              //         ing.ingredient_id ==
+              //         (element.ingredients &&
+              //           element.ingredients[0]?.ingredient_id)
+              //     ) || {};
+              //   return {
+              //     ...element,
+              //     ...findRest,
+              //     ...fullWastes,
+              //     ...findIngredient,
+              //     ingredient_unit:
+              //       findIngredient?.unit == "kg"
+              //         ? "кг"
+              //         : findIngredient?.unit == "p"
+              //         ? "шт"
+              //         : "шт",
+              //     storage_name: findStore.storage_name || "Unknown",
+              //   };
+              // }
+            });
+          } catch (err) {
+            console.error(
+              `Error processing waste item ${item.waste_id}:`,
+              err.message
+            );
+            return [];
+          }
+        })
+      ).then((results) => results.flat().filter(Boolean));
 
-              return resultList; // har bir waste uchun array
-            } catch (err) {
-              console.error(
-                `Error processing waste item ${item.waste_id}:`,
-                err.message
-              );
-              return [];
-            }
-          })
-        )
-      ).flat(); // barcha waste larni tekis arrayga aylantiradi
+      // Excel faylini yaratish
 
       console.log(wastesData);
-      // Excel faylini yaratish
       const exportChunks = [
         {
           name: "Поставки",
@@ -539,7 +526,6 @@ document.addEventListener("DOMContentLoaded", () => {
             "Ед-ца измерения",
             "Сумма без НДС",
             "Причина",
-            "Сотрудник",
           ],
           data: wastesData.map((item) => [
             formatCustomDate(String(item.date || new Date())),
@@ -547,11 +533,12 @@ document.addEventListener("DOMContentLoaded", () => {
             item?.type == 10
               ? item?.ingredient_name || "Unknown"
               : item?.product_name || "Unknown",
-            item?.ingredients[0].weight || 0,
+            item?.type == 10 ? item?.ingredient_left || 0 : item?.count || 0,
             item?.ingredient_unit || "Unknown",
-            formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)),
+            item?.type == 10
+              ? formatSupplySum(Number(item?.total_sum_netto || 0)) + " СУМ"
+              : formatSupplySum(Number(item?.cost_netto || 0)) + " СУМ",
             item.reason_name || "Unknown",
-            item.worker_name || "Unknown",
           ]),
         },
       ];
