@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       : element?.ingredient_unit == "p"
                       ? "шт"
                       : "л",
-                  storage_name: findStore.storage_name || "Unknown",
+                  storage_name: findStore.storage_name || "-",
                 };
               } else {
                 findRest =
@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       : element?.ingredient_unit == "p"
                       ? "шт"
                       : "л",
-                  storage_name: findStore.storage_name || "Unknown",
+                  storage_name: findStore.storage_name || "-",
                 };
               }
             });
@@ -334,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       : findRest?.ingredient_unit == "p"
                       ? "шт"
                       : "л",
-                  storage_name: findStore.storage_name || "Unknown",
+                  storage_name: findStore.storage_name || "-",
                 };
               } else {
                 findRest =
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       : findIngredient?.unit == "p"
                       ? "шт"
                       : "л",
-                  storage_name: findStore.storage_name || "Unknown",
+                  storage_name: findStore.storage_name || "-",
                 };
               }
             });
@@ -421,8 +421,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         : findRest?.ingredient_unit == "p"
                         ? "шт"
                         : "л",
-                    storage_name: findStore.storage_name || "Unknown",
-                    worker_name: findWorker.name || "Unknown",
+                    storage_name: findStore.storage_name || "-",
+                    worker_name: findWorker.name || "-",
                   });
                 } else {
                   const findRest =
@@ -450,8 +450,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             : ingredientMeta?.unit == "p"
                             ? "шт"
                             : "л",
-                        storage_name: findStore.storage_name || "Unknown",
-                        worker_name: findWorker.name || "Unknown",
+                        storage_name: findStore.storage_name || "-",
+                        worker_name: findWorker.name || "-",
                       };
 
                       resultList.push(itemToPush);
@@ -501,8 +501,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             : ingredientMeta?.unit == "p"
                             ? "шт"
                             : "л",
-                        storage_name: findStore.storage_name || "Unknown",
-                        worker_name: findWorker.name || "Unknown",
+                        storage_name: findStore.storage_name || "-",
+                        worker_name: findWorker.name || "-",
                       };
 
                       resultList.push(itemToPush);
@@ -567,16 +567,16 @@ document.addEventListener("DOMContentLoaded", () => {
           data: suppliesData.map((item) => [
             item.supply_id || "",
             formatCustomDate(String(item.date || new Date())),
-            item.supplier_name || "Unknown",
-            item?.ingredient_name || "Unknown",
+            item.supplier_name || "-",
+            item?.ingredient_name || "-",
             Number(item?.supply_ingredient_num) || 0,
-            item?.ingredient_unit || "Unknown",
+            item?.ingredient_unit || "-",
             formatSupplySum(
               Number(item?.supply_ingredient_sum_netto || 0),
               false
             ),
-            item.storage_name || "Unknown",
-            item.supply_comment || "",
+            item.storage_name || "-",
+            item.supply_comment || "-",
           ]),
         },
         {
@@ -594,14 +594,14 @@ document.addEventListener("DOMContentLoaded", () => {
           data: movesData.map((item) => [
             formatCustomDate(String(item.date || new Date())),
             item?.type == 10
-              ? item?.ingredient_name || "Unknown"
-              : item?.product_name || "Unknown",
+              ? item?.ingredient_name || "-"
+              : item?.product_name || "-",
             Number(item?.ingredient_num) || 0,
-            item?.ingredient_unit || "Unknown",
+            item?.type == 10 ? item?.ingredient_unit : item.unit || "шт",
             formatSupplySum(Number(item?.ingredient_sum_netto || 0), false),
-            item.to_storage_name || "Unknown",
-            item.from_storage_name || "Unknown",
-            item.user_name || "Unknown",
+            item.to_storage_name || "-",
+            item.from_storage_name || "-",
+            item.user_name || "-",
           ]),
         },
         {
@@ -618,23 +618,27 @@ document.addEventListener("DOMContentLoaded", () => {
           ],
           data: wastesData.map((item) => [
             formatCustomDate(String(item.date || new Date())), // Дата
-            item.storage_name || "Unknown", // Склад
+            item.storage_name || "-", // Склад
             item?.type == 10
-              ? item?.ingredient_name || "Unknown" // Что списывается
-              : item?.product_name || "Unknown", // Что списывается
+              ? item?.ingredient_name || "-" // Что списывается
+              : item?.product_name || "-", // Что списывается
             item?.type != 2
               ? item?.ingredients[0].weight
               : formatSupplySum(Number(item?.count || 0), false), // Кол-во
             item?.type != 2
-              ? item?.ingredients[0].unit == "kg"
+              ? item?.ingredients?.[0]?.unit == "kg"
                 ? "кг"
-                : item?.ingredients[0].unit == "p"
+                : item?.ingredients?.[0]?.unit == "p"
                 ? "шт"
                 : "л"
-              : item.ingredient_unit, // Ед-ца измерения
+              : item?.unit == "kg"
+              ? "кг"
+              : item?.unit == "p"
+              ? "шт"
+              : "л", // Ед-ца измерения
             formatSupplySum(Number(item?.ingredients[0]?.cost || 0)), // Сумма без НДС
-            item.reason_name || "Unknown", // Причина
-            item.worker_name || "Unknown", // Сотрудник
+            item.reason_name || "-", // Причина
+            item.worker_name || "-", // Сотрудник
           ]),
         },
       ];
