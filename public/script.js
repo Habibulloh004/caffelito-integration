@@ -369,9 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         })
       ).then((results) => results.flat());
-      const off = [];
-      const write = [];
-      const wast = [];
+
       // Wastes ma'lumotlarini qayta ishlash
       wastesData = (
         await Promise.all(
@@ -435,28 +433,108 @@ document.addEventListener("DOMContentLoaded", () => {
 
                   const ingredients = element.ingredients || [];
 
-                  for (const ing of ingredients) {
-                    const ingredientMeta =
-                      ingredientsData.find(
-                        (i) => i.ingredient_id == ing.ingredient_id
-                      ) || {};
+                  if (element.type == 2) {
+                    for (const ing of ingredients) {
+                      const ingredientMeta =
+                        ingredientsData.find(
+                          (i) => i.ingredient_id == ing.ingredient_id
+                        ) || {};
 
-                    const itemToPush = {
-                      ...element,
-                      ...findRest,
-                      ...fullWastes,
-                      ingredients: [ing], // har bir product uchun faqat 1 ta ingredient
-                      ingredient_unit:
-                        ingredientMeta?.unit == "kg"
-                          ? "кг"
-                          : ingredientMeta?.unit == "p"
-                          ? "шт"
-                          : "л",
-                      storage_name: findStore.storage_name || "Unknown",
-                      worker_name: findWorker.name || "Unknown",
-                    };
+                      const itemToPush = {
+                        ...element,
+                        ...findRest,
+                        ...fullWastes,
+                        ingredients: [ing], // har bir product uchun faqat 1 ta ingredient
+                        ingredient_unit:
+                          ingredientMeta?.unit == "kg"
+                            ? "кг"
+                            : ingredientMeta?.unit == "p"
+                            ? "шт"
+                            : "л",
+                        storage_name: findStore.storage_name || "Unknown",
+                        worker_name: findWorker.name || "Unknown",
+                      };
 
-                    resultList.push(itemToPush);
+                      resultList.push(itemToPush);
+                    }
+                    // Misol array
+
+                    if (
+                      resultList.length > 0 &&
+                      resultList[0].ingredients &&
+                      resultList[0].ingredients.length > 0
+                    ) {
+                      let totalCost = 0;
+
+                      // Barcha objectlarning ingredients[0].cost qiymatini yig‘ish
+                      for (let i = 0; i < resultList.length; i++) {
+                        const item = resultList[i];
+                        const costStr = item?.ingredients?.[0]?.cost;
+                        if (costStr) {
+                          const cost = Number(costStr) / 100;
+                          totalCost += cost;
+                        }
+                      }
+
+                      // Birinchi objectga yig‘ilgan qiymatni yozish
+                      resultList[0].ingredients[0].cost = (
+                        totalCost * 100
+                      ).toString(); // qayta 100 ga ko‘paytirib yozish
+
+                      // Faqat 1ta (birinchi) object qoldirish
+                      resultList.splice(1);
+                    }
+                  } else {
+                    for (const ing of ingredients) {
+                      const ingredientMeta =
+                        ingredientsData.find(
+                          (i) => i.ingredient_id == ing.ingredient_id
+                        ) || {};
+
+                      const itemToPush = {
+                        ...element,
+                        ...findRest,
+                        ...fullWastes,
+                        ingredients: [ing], // har bir product uchun faqat 1 ta ingredient
+                        ingredient_unit:
+                          ingredientMeta?.unit == "kg"
+                            ? "кг"
+                            : ingredientMeta?.unit == "p"
+                            ? "шт"
+                            : "л",
+                        storage_name: findStore.storage_name || "Unknown",
+                        worker_name: findWorker.name || "Unknown",
+                      };
+
+                      resultList.push(itemToPush);
+                    }
+                    // Misol array
+
+                    if (
+                      resultList.length > 0 &&
+                      resultList[0].ingredients &&
+                      resultList[0].ingredients.length > 0
+                    ) {
+                      let totalCost = 0;
+
+                      // Barcha objectlarning ingredients[0].cost qiymatini yig‘ish
+                      for (let i = 0; i < resultList.length; i++) {
+                        const item = resultList[i];
+                        const costStr = item?.ingredients?.[0]?.cost;
+                        if (costStr) {
+                          const cost = Number(costStr) / 100;
+                          totalCost += cost;
+                        }
+                      }
+
+                      // Birinchi objectga yig‘ilgan qiymatni yozish
+                      resultList[0].ingredients[0].cost = (
+                        totalCost * 100
+                      ).toString(); // qayta 100 ga ko‘paytirib yozish
+
+                      // Faqat 1ta (birinchi) object qoldirish
+                      resultList.splice(1);
+                    }
                   }
                 }
               }
@@ -473,7 +551,58 @@ document.addEventListener("DOMContentLoaded", () => {
         )
       ).flat(); // barcha waste larni tekis arrayga aylantiradi
 
+      console.log(wastesData, "wasteeeee");
+
+      // for (let i = 0; i < wastesData.length; i++) {
+      //   let current = wastesData[i];
+
+      //   // Faqat product bo'lsa ishlaymiz
+      //   if (!current.product_id) continue;
+
+      //   for (let j = i + 1; j < wastesData.length; j++) {
+      //     let compare = wastesData[j];
+
+      //     // Faqat product bo'lsa ishlaymiz
+      //     if (!compare.product_id) continue;
+
+      //     // Faqat product_id va date bir xil bo‘lsa
+      //     if (
+      //       current.product_id == compare.product_id &&
+      //       current.date == compare.date
+      //     ) {
+      //       let cost1 = current.cost ?? 0;
+      //       let cost2 = compare.cost ?? 0;
+      //       console.log(current, "current")
+      //       console.log(compare, "compare")
+
+      //       // String yoki number aniqlab, 100 ga bo'lish shartini qo‘llaymiz
+      //       let numCost1 =
+      //         typeof cost1 === "string"
+      //           ? parseFloat(cost1) / 100
+      //           : Number(cost1);
+      //       let numCost2 =
+      //         typeof cost2 === "string"
+      //           ? parseFloat(cost2) / 100
+      //           : Number(cost2);
+
+      //       let totalCost = numCost1 + numCost2;
+
+      //       // Avvalgi cost qaysi formatda bo‘lsa, shunga qarab yozamiz
+      //       if (typeof cost1 === "string") {
+      //         current.cost = String(Math.round(totalCost * 100));
+      //       } else {
+      //         current.cost = totalCost;
+      //       }
+
+      //       // remove qilingan objectdagi qiymatlar qo‘shildi — endi o‘chiramiz
+      //       wastesData.splice(j, 1);
+      //       j--; // indeksni to‘g‘rilaymiz
+      //     }
+      //   }
+      // }
+
       // Excel faylini yaratish
+
       const exportChunks = [
         {
           name: "Поставки",
@@ -541,20 +670,24 @@ document.addEventListener("DOMContentLoaded", () => {
             "Сотрудник",
           ],
           data: wastesData.map((item) => [
-            formatCustomDate(String(item.date || new Date())),
-            item.storage_name || "Unknown",
+            formatCustomDate(String(item.date || new Date())), // Дата
+            item.storage_name || "Unknown", // Склад
             item?.type == 10
-              ? item?.ingredient_name || "Unknown"
-              : item?.product_name || "Unknown",
-            item?.ingredients[0].weight || 0,
-            item?.ingredients[0].unit == "kg"
-              ? "кг"
-              : item?.ingredients[0].unit == "p"
-              ? "шт"
-              : "л",
-            formatSupplySum(Number(item?.ingredients[0]?.cost_netto || 0)),
-            item.reason_name || "Unknown",
-            item.worker_name || "Unknown",
+              ? item?.ingredient_name || "Unknown" // Что списывается
+              : item?.product_name || "Unknown", // Что списывается
+            item?.type != 2
+              ? item?.ingredients[0].weight
+              : formatSupplySum(Number(item?.count || 0), false), // Кол-во
+            item?.type != 2
+              ? item?.ingredients[0].unit == "kg"
+                ? "кг"
+                : item?.ingredients[0].unit == "p"
+                ? "шт"
+                : "л"
+              : item.ingredient_unit, // Ед-ца измерения
+            formatSupplySum(Number(item?.ingredients[0]?.cost || 0)), // Сумма без НДС
+            item.reason_name || "Unknown", // Причина
+            item.worker_name || "Unknown", // Сотрудник
           ]),
         },
       ];
