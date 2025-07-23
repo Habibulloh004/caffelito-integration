@@ -395,7 +395,6 @@ document.addEventListener("DOMContentLoaded", () => {
               const resultList = [];
 
               for (const element of elements) {
-                console.log(element);
                 const findStore =
                   storesData.find(
                     (store) => store.storage_id == fullWastes.storage_id
@@ -550,58 +549,6 @@ document.addEventListener("DOMContentLoaded", () => {
           })
         )
       ).flat(); // barcha waste larni tekis arrayga aylantiradi
-
-      console.log(wastesData, "wasteeeee");
-
-      // for (let i = 0; i < wastesData.length; i++) {
-      //   let current = wastesData[i];
-
-      //   // Faqat product bo'lsa ishlaymiz
-      //   if (!current.product_id) continue;
-
-      //   for (let j = i + 1; j < wastesData.length; j++) {
-      //     let compare = wastesData[j];
-
-      //     // Faqat product bo'lsa ishlaymiz
-      //     if (!compare.product_id) continue;
-
-      //     // Faqat product_id va date bir xil bo‘lsa
-      //     if (
-      //       current.product_id == compare.product_id &&
-      //       current.date == compare.date
-      //     ) {
-      //       let cost1 = current.cost ?? 0;
-      //       let cost2 = compare.cost ?? 0;
-      //       console.log(current, "current")
-      //       console.log(compare, "compare")
-
-      //       // String yoki number aniqlab, 100 ga bo'lish shartini qo‘llaymiz
-      //       let numCost1 =
-      //         typeof cost1 === "string"
-      //           ? parseFloat(cost1) / 100
-      //           : Number(cost1);
-      //       let numCost2 =
-      //         typeof cost2 === "string"
-      //           ? parseFloat(cost2) / 100
-      //           : Number(cost2);
-
-      //       let totalCost = numCost1 + numCost2;
-
-      //       // Avvalgi cost qaysi formatda bo‘lsa, shunga qarab yozamiz
-      //       if (typeof cost1 === "string") {
-      //         current.cost = String(Math.round(totalCost * 100));
-      //       } else {
-      //         current.cost = totalCost;
-      //       }
-
-      //       // remove qilingan objectdagi qiymatlar qo‘shildi — endi o‘chiramiz
-      //       wastesData.splice(j, 1);
-      //       j--; // indeksni to‘g‘rilaymiz
-      //     }
-      //   }
-      // }
-
-      // Excel faylini yaratish
 
       const exportChunks = [
         {
