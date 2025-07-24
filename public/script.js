@@ -631,11 +631,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 : item?.ingredients?.[0]?.unit == "p"
                 ? "шт"
                 : "л"
-              : item?.unit == "kg"
-              ? "кг"
-              : item?.unit == "p"
-              ? "шт"
-              : "л", // Ед-ца измерения
+              : "шт",
+            // item?.type != 2
+            //   ? item?.ingredients?.[0]?.unit == "kg"
+            //     ? "кг"
+            //     : item?.ingredients?.[0]?.unit == "p"
+            //     ? "шт"
+            //     : "л"
+            //   : item?.unit == "kg"
+            //   ? "кг"
+            //   : item?.unit == "p"
+            //   ? "шт"
+            //   : "л", // Ед-ца измерения
             formatSupplySum(Number(item?.ingredients[0]?.cost || 0)), // Сумма без НДС
             item.reason_name || "-", // Причина
             item.worker_name || "-", // Сотрудник
