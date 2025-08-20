@@ -4,6 +4,8 @@ const authRoutes = require("./routes/auth");
 const tokenRoutes = require("./routes/token");
 const posterRoutes = require("./routes/poster");
 const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const app = express();
 

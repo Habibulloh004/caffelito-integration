@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
   formData.append("grant_type", "authorization_code");
   formData.append(
     "redirect_uri",
-    "https://expressposterstorage.onrender.com/api/auth"
+    `${process.env.BASE_URL}/api/auth`
   );
   formData.append("code", auth.code);
 
@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
       secure: process.env.NODE_ENV === "production", // Enable secure only in production
     });
 
-    res.redirect(`https://expressposterstorage.onrender.com/?token=${data.access_token}`);
+    res.redirect(`${process.env.BASE_URL}/?token=${data.access_token}`);
   } catch (error) {
     console.error("Error exchanging code for access token:", error.message);
     res.status(500).send("Internal server error");
